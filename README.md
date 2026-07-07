@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project presents an autonomous drone navigation framework capable of exploring unknown environments without relying on GPS. The system combines Frontier-Based Exploration, Occupancy Grid Mapping, and graph-based path planning algorithms to enable efficient exploration, obstacle avoidance, and autonomous return to the starting location.
+This project implements an autonomous drone navigation framework for exploring unknown GPS-denied environments using MuJoCo simulation. The system combines Frontier-Based Exploration, Occupancy Grid Mapping, IMU trajectory tracking, and graph-based path planning to autonomously explore, map, and safely return to the starting position.
 
 The project was developed during my Research Internship at the Centre of Excellence in Product Design & Smart Manufacturing (CEPDSM), Maulana Azad National Institute of Technology (MANIT), Bhopal.
 
@@ -10,26 +10,18 @@ The project was developed during my Research Internship at the Centre of Excelle
 
 ## Problem Statement
 
-Traditional drone navigation depends heavily on GPS signals. However, GPS is unavailable or unreliable in environments such as:
-
-- Indoor buildings
-- Underground tunnels
-- Disaster zones
-- Dense forests
-- Industrial facilities
-
-This project addresses the challenge by enabling autonomous exploration and navigation using onboard sensing and intelligent path planning.
+Autonomous drones operating in indoor, underground, or disaster environments cannot rely on GPS for localization. The objective of this project is to enable safe and efficient autonomous exploration while constructing an environmental map and computing an optimal return path.
 
 ---
 
 ## Objectives
 
 - Explore unknown environments autonomously.
-- Generate a real-time occupancy grid map.
-- Detect obstacles during exploration.
-- Identify unexplored frontier regions.
-- Compute the optimal return path after exploration.
-- Navigate safely without GPS.
+- Generate real-time occupancy grid maps.
+- Detect and rank exploration frontiers.
+- Avoid obstacles during navigation.
+- Compute the optimal return path using graph search algorithms.
+- Evaluate exploration coverage and navigation performance.
 
 ---
 
@@ -41,7 +33,7 @@ This project addresses the challenge by enabling autonomous exploration and navi
 - Frontier-Based Exploration
 - A* Algorithm
 - Dijkstra's Algorithm
-- Graph Search
+- IMU Trajectory Tracking
 - VS Code
 - Git & GitHub
 
@@ -49,91 +41,89 @@ This project addresses the challenge by enabling autonomous exploration and navi
 
 ## Project Workflow
 
-### Step 1: Environment Initialization
-- Load the simulation environment in MuJoCo.
-- Initialize the drone and occupancy grid.
+### 1. Environment Initialization
+- Load the MuJoCo simulation environment.
+- Initialize the drone and occupancy grid map.
 
-### Step 2: Autonomous Exploration
-- Detect frontier cells between explored and unexplored regions.
-- Select the nearest frontier.
-- Navigate towards the selected frontier.
+### 2. Autonomous Exploration
+- Detect unexplored frontier cells.
+- Rank candidate frontiers.
+- Navigate towards the highest-priority frontier.
 
-### Step 3: Environment Mapping
-- Update the occupancy grid continuously.
-- Mark free space and obstacles.
+### 3. Environment Mapping
+- Continuously update the occupancy grid.
+- Detect free space and obstacles.
 - Build a complete map of the environment.
 
-### Step 4: Path Planning
-- Apply A* Algorithm for efficient navigation.
-- Use Dijkstra's Algorithm to compute the optimal return path.
+### 4. Path Planning
+- Use A* and Dijkstra's Algorithm to generate efficient navigation and return paths.
 
-### Step 5: Autonomous Return
-- After completing exploration, the drone returns safely to the starting position using the shortest available path.
+### 5. Mission Analysis
+- Evaluate exploration coverage.
+- Record flight trajectory.
+- Analyze mapping performance and navigation efficiency.
 
 ---
 
 ## Features
 
-- GPS-independent navigation
-- Frontier-Based Exploration
-- Real-time Occupancy Grid Mapping
-- Autonomous obstacle avoidance
-- Optimal path planning
-- Autonomous return-to-base
-- MuJoCo-based simulation
+- Autonomous Frontier-Based Exploration
+- Real-Time Occupancy Grid Mapping
+- Dynamic Obstacle Detection
+- IMU Trajectory Tracking
+- A* Path Planning
+- Dijkstra-Based Return Navigation
+- Coverage Metrics Evaluation
+- Mission Performance Analysis
+- MuJoCo Physics-Based Simulation
 
 ---
 
 ## Algorithms Used
 
 ### Frontier-Based Exploration
-Identifies the boundary between explored and unexplored regions to maximize exploration efficiency.
+Detects unexplored frontier regions and guides the drone toward areas that maximize map coverage.
 
 ### Occupancy Grid Mapping
-Represents the environment as a grid where each cell stores occupancy information.
+Represents the environment as a grid to identify free, occupied, and unexplored regions.
 
 ### A* Algorithm
-Computes an efficient path to exploration targets while avoiding obstacles.
+Computes efficient exploration paths while avoiding obstacles.
 
 ### Dijkstra's Algorithm
-Calculates the shortest path from the exploration endpoint back to the starting position.
+Calculates the shortest return path from the final exploration point to the starting location.
 
 ---
 
 ## Project Structure
 
 ```
-Autonomous-Drone-Navigation/
+Autonomous-Drone-Navigation
 │
-├── src/
-│   ├── exploration.py
-│   ├── mapping.py
-│   ├── path_planning.py
-│   ├── controller.py
-│
+├── frontier_detection.py
+├── frontier_ranking.py
+├── occupancy_grid_mapping.py
+├── imu_trajectory.py
+├── mission_manager.py
+├── coverage_metrics.py
+├── post_mission_analysis.py
+├── sensor_fusion.py
+├── dynamic_obstacles.py
+├── scene.xml
 ├── assets/
-│
-├── models/
-│
 ├── results/
-│
-├── README.md
-│
-└── requirements.txt
+└── README.md
 ```
 
 ---
 
 ## Results
 
-- Successfully explored unknown environments.
+- Successfully explored unknown environments autonomously.
 - Generated occupancy grid maps in real time.
-- Detected obstacles autonomously.
-- Computed optimal exploration and return paths.
-- Demonstrated reliable GPS-denied navigation within the MuJoCo simulator.
-
----
-
+- Detected and ranked frontier regions for efficient exploration.
+- Computed optimal navigation and return paths using A* and Dijkstra's Algorithm.
+- Evaluated mission coverage, flight trajectory, and mapping performance within the MuJoCo simulator.
 
 ---
 
@@ -142,12 +132,11 @@ Autonomous-Drone-Navigation/
 - Python Programming
 - Robotics Simulation
 - Autonomous Navigation
-- Occupancy Grid Mapping
 - Frontier-Based Exploration
+- Occupancy Grid Mapping
 - Path Planning
 - A* Algorithm
 - Dijkstra's Algorithm
-- Problem Solving
+- IMU Trajectory Tracking
+- Performance Evaluation
 - Research & Technical Documentation
-
----
