@@ -1,0 +1,7 @@
+Parameter,Value
+origin_x,-8.0
+origin_y,-8.0
+width_meters,16.0
+height_meters,16.0
+grid_size,160
+resolution_meters_per_cell,0.1

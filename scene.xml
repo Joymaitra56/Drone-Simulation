@@ -1,0 +1,384 @@
+<mujoco model="Neon Grid Space Simulation">
+    <compiler coordinate="local" angle="degree" inertiafromgeom="true"/>
+    <option gravity="0 0 -9.81" timestep="0.005"/>
+
+    <asset>
+        <!-- Load the custom neon grid texture -->
+        <texture name="grid_tex" type="2d" file="grid_pattern.png"/>
+        <!-- Create a dark gradient skybox for futuristic cyberpunk atmosphere -->
+        <texture name="sky_tex" type="skybox" builtin="gradient" rgb1="0.02 0.04 0.08" rgb2="0.005 0.01 0.015" width="512" height="512"/>
+        
+        <!-- Materials mapping -->
+        <material name="grid_mat" texture="grid_tex" texrepeat="5 5" texuniform="true" roughness="0.9" specular="0.1"/>
+        <material name="glow_cyan" rgba="0.0 0.8 1.0 0.8" emission="0.8" roughness="0.1" specular="0.9"/>
+        <material name="glow_blue" rgba="0.0 0.3 1.0 0.9" emission="0.8"/>
+        <material name="metal_dark" rgba="0.1 0.12 0.15 1.0" roughness="0.2" specular="0.8"/>
+        <material name="rock_mat" rgba="0.18 0.16 0.15 1.0" roughness="0.95" specular="0.05"/>
+        <material name="glow_magenta" rgba="0.9 0.0 0.8 0.8" emission="0.8"/>
+        <material name="metal_light" rgba="0.6 0.65 0.7 1.0" roughness="0.1" specular="0.9"/>
+        <material name="rotor_green" rgba="0.0 1.0 0.4 0.4" emission="0.5"/>
+
+        <!-- Load the rough terrain heightmap (spans 8x8m matching plane size, max height 0.4m) -->
+        <hfield name="terrain" file="rough_terrain_heightmap.png" size="8 8 0.4 0.01"/>
+    </asset>
+
+    <worldbody>
+        <!-- Cyan/Blue atmospheric lights -->
+        <light directional="true" diffuse="0.08 0.12 0.18" specular="0.02 0.03 0.05" pos="0 0 12" dir="0 0 -1" castshadow="false"/>
+        <!-- Main overhead neon spotlights casting shadows -->
+        <light directional="false" diffuse="0.0 0.8 1.0" specular="0.0 0.8 1.0" pos="0 0 5" dir="0 0 -1" castshadow="true"/>
+        <light directional="false" diffuse="0.8 0.0 1.0" specular="0.8 0.0 1.0" pos="-4 -4 4" dir="0 0 -1" castshadow="false"/>
+
+        <!-- Neon-grid Ground Platform (Rough Martian/Lunar Terrain) -->
+        <geom name="floor" type="hfield" hfield="terrain" material="grid_mat" condim="3"/>
+
+        <!-- Landing Spots (Nodes) -->
+        <!-- 1. Home Landing Spot: Cyan/blue double-ring, located at [-4, -4] -->
+        <body name="landing_home" pos="-4 -4 0">
+            <geom name="home_pad_base" type="cylinder" size="0.6 0.01" material="metal_dark" condim="3"/>
+            <geom name="home_pad_glow" type="cylinder" size="0.58 0.011" material="glow_blue"/>
+            <geom name="home_pad_center" type="cylinder" size="0.45 0.012" material="metal_dark"/>
+            <geom name="home_pad_inner" type="cylinder" size="0.15 0.013" material="glow_cyan"/>
+        </body>
+
+        <!-- 2. Target Landing Spot 1 -->
+        <body name="landing_spot_1" pos="-4 4 0">
+            <geom name="spot1_base" type="cylinder" size="0.4 0.01" material="metal_dark" condim="3"/>
+            <geom name="spot1_glow" type="cylinder" size="0.38 0.011" material="glow_cyan"/>
+            <geom name="spot1_inner" type="cylinder" size="0.1 0.012" material="metal_dark"/>
+        </body>
+
+        <!-- 3. Target Landing Spot 2 -->
+        <body name="landing_spot_2" pos="4 4 0">
+            <geom name="spot2_base" type="cylinder" size="0.4 0.01" material="metal_dark" condim="3"/>
+            <geom name="spot2_glow" type="cylinder" size="0.38 0.011" material="glow_cyan"/>
+            <geom name="spot2_inner" type="cylinder" size="0.1 0.012" material="metal_dark"/>
+        </body>
+
+        <!-- 4. Target Landing Spot 3 -->
+        <body name="landing_spot_3" pos="4 -4 0">
+            <geom name="spot3_base" type="cylinder" size="0.4 0.01" material="metal_dark" condim="3"/>
+            <geom name="spot3_glow" type="cylinder" size="0.38 0.011" material="glow_cyan"/>
+            <geom name="spot3_inner" type="cylinder" size="0.1 0.012" material="metal_dark"/>
+        </body>
+
+        <!-- 5. Target Landing Spot 4 -->
+        <body name="landing_spot_4" pos="0 2 0">
+            <geom name="spot4_base" type="cylinder" size="0.4 0.01" material="metal_dark" condim="3"/>
+            <geom name="spot4_glow" type="cylinder" size="0.38 0.011" material="glow_cyan"/>
+            <geom name="spot4_inner" type="cylinder" size="0.1 0.012" material="metal_dark"/>
+        </body>
+
+        <!-- 6. Target Landing Spot 5 -->
+        <body name="landing_spot_5" pos="0 -2 0">
+            <geom name="spot5_base" type="cylinder" size="0.4 0.01" material="metal_dark" condim="3"/>
+            <geom name="spot5_glow" type="cylinder" size="0.38 0.011" material="glow_cyan"/>
+            <geom name="spot5_inner" type="cylinder" size="0.1 0.012" material="metal_dark"/>
+        </body>
+
+        <!-- Rocky Obstructions (Scattered around, but NOT at the landing pads) -->
+        <!-- Rock 1 (Large tilted boulder with cyber-crystals) -->
+        <body name="rock_1" pos="-2.5 1.5 0.1" euler="20 15 30">
+            <geom name="rock1_geom" type="ellipsoid" size="0.35 0.25 0.25" material="rock_mat" condim="3"/>
+            <geom name="rock1_crystal" type="sphere" size="0.08" pos="0.1 0.1 0.2" material="glow_cyan"/>
+        </body>
+
+        <!-- Rock 2 (Angular blocky formation) -->
+        <body name="rock_2" pos="2.5 1.5 0.12" euler="-15 30 10">
+            <geom name="rock2_geom" type="box" size="0.3 0.25 0.35" material="rock_mat" condim="3"/>
+            <geom name="rock2_crystal" type="cylinder" size="0.02 0.1" pos="-0.1 -0.1 0.3" euler="30 0 0" material="glow_magenta"/>
+        </body>
+
+        <!-- Rock 3 (Large low boulder) -->
+        <body name="rock_3" pos="2.0 -2.5 0.08" euler="10 -20 45">
+            <geom name="rock3_geom" type="ellipsoid" size="0.45 0.35 0.2" material="rock_mat" condim="3"/>
+            <geom name="rock3_crystal" type="sphere" size="0.07" pos="0.2 -0.1 0.15" material="glow_cyan"/>
+        </body>
+
+        <!-- Rock 4 (Medium sharp block) -->
+        <body name="rock_4" pos="-2.0 -2.5 0.1" euler="25 10 -15">
+            <geom name="rock4_geom" type="box" size="0.25 0.25 0.3" material="rock_mat" condim="3"/>
+            <geom name="rock4_crystal" type="cylinder" size="0.015 0.08" pos="0.1 0.1 0.25" material="glow_magenta"/>
+        </body>
+
+        <!-- Rock 5 (Tall volcanic rock) -->
+        <body name="rock_5" pos="0.0 4.5 0.18" euler="-10 40 5">
+            <geom name="rock5_geom" type="ellipsoid" size="0.28 0.28 0.45" material="rock_mat" condim="3"/>
+            <geom name="rock5_crystal" type="sphere" size="0.06" pos="-0.1 0.1 0.35" material="glow_cyan"/>
+        </body>
+
+        <!-- Rock 6 (Small rounded pebble) -->
+        <body name="rock_6" pos="-4.5 0.0 0.08" euler="35 -5 10">
+            <geom name="rock6_geom" type="ellipsoid" size="0.3 0.2 0.2" material="rock_mat" condim="3"/>
+        </body>
+
+        <!-- Rock 7 (Sharp edge-rock) -->
+        <body name="rock_7" pos="4.5 0.0 0.1" euler="5 25 -30">
+            <geom name="rock7_geom" type="box" size="0.2 0.35 0.3" material="rock_mat" condim="3"/>
+            <geom name="rock7_crystal" type="sphere" size="0.05" pos="0.0 0.15 0.25" material="glow_cyan"/>
+        </body>
+
+        <!-- Rock 8 (Small flat rock near bottom) -->
+        <body name="rock_8" pos="0.0 -4.5 0.06" euler="15 -10 20">
+            <geom name="rock8_geom" type="ellipsoid" size="0.32 0.28 0.18" material="rock_mat" condim="3"/>
+        </body>
+        <!-- DYNAMIC STONES START -->
+        <!-- Large Rock 1 -->
+        <body name="dyn_large_rock_1" pos="2.01 -6.84 0.46" euler="4.5 -23.4 33.7">
+            <geom type="ellipsoid" size="0.41 0.39 0.66" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Large Rock 2 -->
+        <body name="dyn_large_rock_2" pos="1.47 0.88 0.38" euler="4.5 15.5 2.3">
+            <geom type="box" size="0.49 0.49 0.55" material="rock_mat" condim="3"/>
+            <geom type="sphere" size="0.046" pos="0.10 -0.08 0.49" material="glow_magenta"/>
+        </body>
+        <!-- Large Rock 3 -->
+        <body name="dyn_large_rock_3" pos="-5.73 -1.73 0.34" euler="11.5 1.8 350.3">
+            <geom type="ellipsoid" size="0.42 0.42 0.49" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Large Rock 4 -->
+        <body name="dyn_large_rock_4" pos="1.71 5.21 0.29" euler="13.7 24.3 307.9">
+            <geom type="ellipsoid" size="0.47 0.49 0.42" material="rock_mat" condim="3"/>
+            <geom type="sphere" size="0.073" pos="-0.06 -0.02 0.37" material="glow_cyan"/>
+        </body>
+        <!-- Large Rock 5 -->
+        <body name="dyn_large_rock_5" pos="-1.87 -4.18 0.44" euler="1.7 -12.8 166.4">
+            <geom type="ellipsoid" size="0.40 0.54 0.63" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Large Rock 6 -->
+        <body name="dyn_large_rock_6" pos="6.13 2.71 0.47" euler="-13.5 -23.4 113.6">
+            <geom type="ellipsoid" size="0.39 0.41 0.67" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Large Rock 7 -->
+        <body name="dyn_large_rock_7" pos="-4.16 6.38 0.44" euler="19.2 7.1 51.4">
+            <geom type="box" size="0.53 0.41 0.63" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Large Rock 8 -->
+        <body name="dyn_large_rock_8" pos="3.53 0.56 0.42" euler="-14.0 24.9 183.4">
+            <geom type="box" size="0.50 0.44 0.60" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Large Rock 9 -->
+        <body name="dyn_large_rock_9" pos="-6.52 -5.62 0.38" euler="-5.8 4.8 168.5">
+            <geom type="ellipsoid" size="0.48 0.51 0.55" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Large Rock 10 -->
+        <body name="dyn_large_rock_10" pos="0.77 6.37 0.50" euler="13.4 -8.0 105.7">
+            <geom type="box" size="0.49 0.37 0.71" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Small Rock 1 -->
+        <body name="dyn_small_rock_1" pos="-7.15 3.20 0.11" euler="0.5 -27.6 225.1">
+            <geom type="ellipsoid" size="0.21 0.24 0.19" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Small Rock 2 -->
+        <body name="dyn_small_rock_2" pos="-4.34 -1.82 0.13" euler="29.3 6.9 175.9">
+            <geom type="ellipsoid" size="0.14 0.23 0.21" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Small Rock 3 -->
+        <body name="dyn_small_rock_3" pos="6.99 4.42 0.10" euler="-29.5 16.2 293.8">
+            <geom type="ellipsoid" size="0.15 0.15 0.16" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Small Rock 4 -->
+        <body name="dyn_small_rock_4" pos="6.88 0.47 0.13" euler="-23.4 1.9 218.4">
+            <geom type="ellipsoid" size="0.14 0.20 0.21" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Small Rock 5 -->
+        <body name="dyn_small_rock_5" pos="6.69 6.18 0.11" euler="-7.1 12.0 134.4">
+            <geom type="ellipsoid" size="0.21 0.20 0.18" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Small Rock 6 -->
+        <body name="dyn_small_rock_6" pos="5.75 -0.70 0.05" euler="3.8 6.2 2.6">
+            <geom type="ellipsoid" size="0.15 0.13 0.08" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Small Rock 7 -->
+        <body name="dyn_small_rock_7" pos="2.99 -6.35 0.08" euler="1.0 -15.5 174.7">
+            <geom type="ellipsoid" size="0.13 0.12 0.13" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Small Rock 8 -->
+        <body name="dyn_small_rock_8" pos="0.56 3.22 0.07" euler="-1.9 -6.5 34.0">
+            <geom type="ellipsoid" size="0.23 0.19 0.11" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Small Rock 9 -->
+        <body name="dyn_small_rock_9" pos="-1.28 5.24 0.10" euler="-30.8 16.0 288.2">
+            <geom type="ellipsoid" size="0.13 0.20 0.17" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Small Rock 10 -->
+        <body name="dyn_small_rock_10" pos="-5.63 -4.44 0.06" euler="-2.6 26.2 27.1">
+            <geom type="ellipsoid" size="0.18 0.14 0.11" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Small Rock 11 -->
+        <body name="dyn_small_rock_11" pos="4.44 5.13 0.09" euler="-34.0 -28.5 271.3">
+            <geom type="ellipsoid" size="0.13 0.20 0.16" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Small Rock 12 -->
+        <body name="dyn_small_rock_12" pos="-3.80 -1.35 0.12" euler="-23.5 -34.8 140.6">
+            <geom type="ellipsoid" size="0.18 0.22 0.21" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Small Rock 13 -->
+        <body name="dyn_small_rock_13" pos="6.14 4.11 0.11" euler="19.8 11.3 175.2">
+            <geom type="ellipsoid" size="0.15 0.20 0.18" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Small Rock 14 -->
+        <body name="dyn_small_rock_14" pos="-6.36 3.39 0.05" euler="-1.6 29.4 191.2">
+            <geom type="ellipsoid" size="0.13 0.16 0.09" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Small Rock 15 -->
+        <body name="dyn_small_rock_15" pos="-6.38 0.11 0.05" euler="25.3 -6.7 339.0">
+            <geom type="ellipsoid" size="0.22 0.13 0.09" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Small Rock 16 -->
+        <body name="dyn_small_rock_16" pos="-2.64 -3.44 0.07" euler="-25.8 10.2 164.6">
+            <geom type="ellipsoid" size="0.20 0.16 0.12" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Small Rock 17 -->
+        <body name="dyn_small_rock_17" pos="6.18 6.27 0.10" euler="-28.0 2.6 182.1">
+            <geom type="ellipsoid" size="0.12 0.19 0.16" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Small Rock 18 -->
+        <body name="dyn_small_rock_18" pos="-5.29 -2.17 0.07" euler="-4.3 3.0 108.9">
+            <geom type="ellipsoid" size="0.13 0.15 0.12" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Small Rock 19 -->
+        <body name="dyn_small_rock_19" pos="-5.71 5.45 0.11" euler="-24.1 -15.3 75.8">
+            <geom type="ellipsoid" size="0.15 0.23 0.18" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Small Rock 20 -->
+        <body name="dyn_small_rock_20" pos="-2.26 2.70 0.07" euler="28.6 -31.4 228.3">
+            <geom type="ellipsoid" size="0.22 0.18 0.12" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Small Rock 21 -->
+        <body name="dyn_small_rock_21" pos="4.74 -6.57 0.13" euler="-23.7 -4.1 254.0">
+            <geom type="ellipsoid" size="0.16 0.14 0.22" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Small Rock 22 -->
+        <body name="dyn_small_rock_22" pos="0.88 -5.59 0.06" euler="-32.5 -9.2 198.9">
+            <geom type="ellipsoid" size="0.23 0.20 0.10" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Small Rock 23 -->
+        <body name="dyn_small_rock_23" pos="-1.01 -6.60 0.13" euler="-32.2 -10.0 245.5">
+            <geom type="ellipsoid" size="0.16 0.23 0.22" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Small Rock 24 -->
+        <body name="dyn_small_rock_24" pos="0.86 5.40 0.13" euler="-18.4 -23.6 288.0">
+            <geom type="ellipsoid" size="0.24 0.21 0.21" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Small Rock 25 -->
+        <body name="dyn_small_rock_25" pos="-4.65 -1.26 0.11" euler="-6.2 11.9 264.6">
+            <geom type="ellipsoid" size="0.14 0.23 0.19" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Small Rock 26 -->
+        <body name="dyn_small_rock_26" pos="2.90 -1.69 0.06" euler="29.3 -10.5 295.4">
+            <geom type="ellipsoid" size="0.12 0.18 0.11" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Small Rock 27 -->
+        <body name="dyn_small_rock_27" pos="5.35 -3.99 0.07" euler="-30.1 19.1 126.4">
+            <geom type="ellipsoid" size="0.20 0.17 0.12" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Small Rock 28 -->
+        <body name="dyn_small_rock_28" pos="4.95 -2.43 0.07" euler="5.6 33.8 13.8">
+            <geom type="ellipsoid" size="0.12 0.23 0.12" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Small Rock 29 -->
+        <body name="dyn_small_rock_29" pos="4.12 -0.92 0.12" euler="-21.7 -31.9 157.0">
+            <geom type="ellipsoid" size="0.24 0.13 0.21" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Small Rock 30 -->
+        <body name="dyn_small_rock_30" pos="2.69 6.34 0.08" euler="31.4 29.5 224.3">
+            <geom type="ellipsoid" size="0.21 0.14 0.14" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Small Rock 31 -->
+        <body name="dyn_small_rock_31" pos="2.35 -5.41 0.10" euler="-12.2 13.8 199.6">
+            <geom type="ellipsoid" size="0.23 0.18 0.17" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Small Rock 32 -->
+        <body name="dyn_small_rock_32" pos="-4.44 2.37 0.06" euler="4.8 -6.6 300.1">
+            <geom type="ellipsoid" size="0.17 0.21 0.10" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Small Rock 33 -->
+        <body name="dyn_small_rock_33" pos="-2.82 -4.17 0.08" euler="-4.1 12.3 184.0">
+            <geom type="ellipsoid" size="0.21 0.19 0.13" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Small Rock 34 -->
+        <body name="dyn_small_rock_34" pos="4.23 6.62 0.07" euler="11.5 8.3 33.6">
+            <geom type="ellipsoid" size="0.21 0.20 0.12" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Small Rock 35 -->
+        <body name="dyn_small_rock_35" pos="6.51 -3.82 0.06" euler="-31.8 33.9 220.1">
+            <geom type="ellipsoid" size="0.16 0.22 0.10" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Small Rock 36 -->
+        <body name="dyn_small_rock_36" pos="5.56 1.09 0.08" euler="-24.7 13.1 321.4">
+            <geom type="ellipsoid" size="0.21 0.17 0.14" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Small Rock 37 -->
+        <body name="dyn_small_rock_37" pos="5.19 5.55 0.12" euler="13.7 -2.5 200.7">
+            <geom type="ellipsoid" size="0.21 0.15 0.19" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Small Rock 38 -->
+        <body name="dyn_small_rock_38" pos="6.01 -5.45 0.09" euler="4.1 -12.8 271.9">
+            <geom type="ellipsoid" size="0.14 0.18 0.15" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Small Rock 39 -->
+        <body name="dyn_small_rock_39" pos="5.65 -1.05 0.06" euler="25.3 -3.5 270.6">
+            <geom type="ellipsoid" size="0.23 0.17 0.10" material="rock_mat" condim="3"/>
+        </body>
+        <!-- Small Rock 40 -->
+        <body name="dyn_small_rock_40" pos="4.89 -3.21 0.07" euler="-4.2 14.9 84.4">
+            <geom type="ellipsoid" size="0.21 0.18 0.11" material="rock_mat" condim="3"/>
+        </body>
+        <!-- DYNAMIC STONES END -->
+
+        <!-- Drone Body Setup -->
+        <!-- Placed on the home pad. Has a free joint for physics. -->
+        <body name="drone" pos="-4 -4 0.12">
+            <joint name="drone_joint" type="free"/>
+
+            <!-- Main Central Hub (Carbon Fiber look) -->
+            <geom name="drone_hub" type="ellipsoid" size="0.14 0.12 0.04" material="metal_dark" mass="0.6"/>
+            <!-- Camera / Sensor Sphere (front facing) -->
+            <geom name="drone_camera" type="sphere" size="0.03" pos="0.12 0 0" material="glow_cyan"/>
+
+            <!-- Diagonally Extending Arms -->
+            <geom name="arm_fr" type="cylinder" fromto="0 0 0  0.15 0.15 0.01" size="0.012" material="metal_light"/>
+            <geom name="arm_fl" type="cylinder" fromto="0 0 0  0.15 -0.15 0.01" size="0.012" material="metal_light"/>
+            <geom name="arm_br" type="cylinder" fromto="0 0 0  -0.15 0.15 0.01" size="0.012" material="metal_light"/>
+            <geom name="arm_bl" type="cylinder" fromto="0 0 0  -0.15 -0.15 0.01" size="0.012" material="metal_light"/>
+
+            <!-- Landing Gear / Legs -->
+            <geom name="leg_fr" type="cylinder" fromto="0.14 0.14 -0.01  0.14 0.14 -0.11" size="0.008" material="metal_dark" condim="3"/>
+            <geom name="foot_fr" type="sphere" size="0.012" pos="0.14 0.14 -0.11" material="metal_dark" condim="3"/>
+            <geom name="leg_fl" type="cylinder" fromto="0.14 -0.14 -0.01  0.14 -0.14 -0.11" size="0.008" material="metal_dark" condim="3"/>
+            <geom name="foot_fl" type="sphere" size="0.012" pos="0.14 -0.14 -0.11" material="metal_dark" condim="3"/>
+            <geom name="leg_br" type="cylinder" fromto="-0.14 0.14 -0.01  -0.14 0.14 -0.11" size="0.008" material="metal_dark" condim="3"/>
+            <geom name="foot_br" type="sphere" size="0.012" pos="-0.14 0.14 -0.11" material="metal_dark" condim="3"/>
+            <geom name="leg_bl" type="cylinder" fromto="-0.14 -0.14 -0.01  -0.14 -0.14 -0.11" size="0.008" material="metal_dark" condim="3"/>
+            <geom name="foot_bl" type="sphere" size="0.012" pos="-0.14 -0.14 -0.11" material="metal_dark" condim="3"/>
+
+            <!-- Rotors / Propellers (Visual green translucent discs + caps) -->
+            <geom name="rotor_fr_cap" type="cylinder" size="0.02 0.01" pos="0.15 0.15 0.02" material="metal_dark"/>
+            <geom name="rotor_fr_blade" type="cylinder" size="0.10 0.002" pos="0.15 0.15 0.025" material="rotor_green"/>
+            <geom name="rotor_fl_cap" type="cylinder" size="0.02 0.01" pos="0.15 -0.15 0.02" material="metal_dark"/>
+            <geom name="rotor_fl_blade" type="cylinder" size="0.10 0.002" pos="0.15 -0.15 0.025" material="rotor_green"/>
+            <geom name="rotor_br_cap" type="cylinder" size="0.02 0.01" pos="-0.15 0.15 0.02" material="metal_dark"/>
+            <geom name="rotor_br_blade" type="cylinder" size="0.10 0.002" pos="-0.15 0.15 0.025" material="rotor_green"/>
+            <geom name="rotor_bl_cap" type="cylinder" size="0.02 0.01" pos="-0.15 -0.15 0.02" material="metal_dark"/>
+            <geom name="rotor_bl_blade" type="cylinder" size="0.10 0.002" pos="-0.15 -0.15 0.025" material="rotor_green"/>
+        </body>
+        
+        <!-- DYNAMIC PLAYBACK OBS (Initially Underground) -->
+        <body name="dynamic_obstacle_1" pos="0 0 -10">
+            <geom name="dyn_obs_1_geom" type="box" size="0.3 0.3 0.6" material="glow_magenta" condim="3"/>
+        </body>
+        <body name="dynamic_obstacle_2" pos="0 0 -10">
+            <geom name="dyn_obs_2_geom" type="box" size="0.35 0.35 0.7" material="glow_magenta" condim="3"/>
+        </body>
+        <body name="dynamic_obstacle_3" pos="0 0 -10">
+            <geom name="dyn_obs_3_geom" type="ellipsoid" size="0.4 0.4 0.5" material="glow_magenta" condim="3"/>
+        </body>
+        <body name="dynamic_obstacle_4" pos="0 0 -10">
+            <geom name="dyn_obs_4_geom" type="box" size="0.25 0.25 0.5" material="glow_magenta" condim="3"/>
+        </body>
+        <body name="dynamic_obstacle_5" pos="0 0 -10">
+            <geom name="dyn_obs_5_geom" type="ellipsoid" size="0.3 0.3 0.6" material="glow_magenta" condim="3"/>
+        </body>
+    </worldbody>
+</mujoco>
